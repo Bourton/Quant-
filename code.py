@@ -1,5 +1,5 @@
 ### 导入模块
-```
+
 import pandas as pd
 import numpy as np
 from time import time
@@ -25,11 +25,11 @@ warnings.filterwarnings('ignore')
 mpl.rcParams["font.family"] = "SimHei"
 mpl.rcParams["axes.unicode_minus"] = False
 plt.style.use('ggplot')
-```
 
-### 1. 数据获取
-1.1参数设置
-```
+
+########1. 数据获取
+#1.1参数设置
+
 # 样本区间
 START_DATE = '2010-01-01'
 END_DATE = '2020-04-30'
@@ -38,9 +38,8 @@ END_DATE = '2020-04-30'
 INDEX = '399905.XSHE'
 # 排名前0.3为1,后0.3为0
 percent_select = [0.3, 0.3]  
-```
-1.1.1财务数据
-```
+
+#1.1.1财务数据
 q = query(valuation.code,   # 股票代码
       valuation.market_cap, # 市值
       valuation.circulating_market_cap, # 流通市值
@@ -61,9 +60,8 @@ q = query(valuation.code,   # 股票代码
       indicator.roa, #总资产净利率
       indicator.gross_profit_margin #销售毛利率GPM
     )  # 查询字段
-```
-1.1.2聚宽因子列表
-```
+
+#1.1.2聚宽因子列表
 # 作为get_factor_values()中的参数factors
 jqfactor_list = ['current_ratio', #流动比率
                   'net_profit_to_total_operate_revenue_ttm', #销售净利率
@@ -86,9 +84,9 @@ jqfactor_list = ['current_ratio', #流动比率
                   'VOL60',  #60日平均换手率
                   'Skewness20', # 个股收益的20日偏度
                   'Skewness60'] #个股收益的60日偏度
-```
-1.2获取交易日历(月频)
-```
+
+########1.2获取交易日历(月频)
+
 def get_trade_days_monthly(start,end):
     '''
     获取每月月底的交易日的日历
@@ -105,9 +103,9 @@ def get_trade_days_monthly(start,end):
     df.index = pd.to_datetime(df.index)
     # 按月重采样,缺失值用上一个填充,那么刚好值就是想要的每月最后一个交易日
     return list(df.resample('m', how='last').iloc[:,0])
-```
-1.3筛选股票池
-```
+
+########1.3筛选股票池
+
 # 去除上市距截面期不足n天的股票
 def remove_new(stocks,beginDate,n):
     stocklist=[]
@@ -145,9 +143,9 @@ def get_stocks_filtered(beginDate,n,indexID=INDEX):
     stocklist = remove_st(stocklist,beginDate)
     stocklist = remove_paused(stocklist,beginDate)
     return stocklist
-```
-1.4因子数据获取
-```
+
+########1.4因子数据获取
+
 def get_df_jqfactor(stocklist,factor_list,date):
     '''
     获取聚宽因子
@@ -168,8 +166,7 @@ def get_df_jqfactor(stocklist,factor_list,date):
         df_jqfactor[factor]=factor_data[factor].iloc[0,:]
     
     return df_jqfactor
-```
-```
+
 def get_newfactors_df(stocklist,df,date):
     """
     stocklist: 股票列表
@@ -239,8 +236,7 @@ def get_newfactors_df(stocklist,df,date):
 
     return df_new
 
-```
-```
+
 def get_all_factors_dict(trade_days,q):
     original_factor_dict = {}
     for date in trade_days:
@@ -260,28 +256,22 @@ def get_all_factors_dict(trade_days,q):
         print("获取数据成功!")
         print('='*30)
     return original_factor_dict
-```
-```
+
+
 # 交易日期
 trade_days_all = get_trade_days_monthly(START_DATE,END_DATE)
 # 分测试集
 trade_days_test = trade_days_all[88:]
-```
 
-```
 start = time()
 original_factor_dict = get_all_factors_dict(trade_days_all,q)
 end = time()
 print(datetime.datetime.fromtimestamp(end-start).strftime("%M:%S:%f"))
-```
 
-```
 # 保存原始数据
 content = pickle.dumps(original_factor_dict) 
 write_file('original_factor_dict.pkl', content, append=False)
-```
 
-```
 with open('original_factor_dict.pkl','rb') as pf:
     original_factor_dict = pickle.load(pf)
-```
+
